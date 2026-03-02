@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой профиль — FitPartner</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">💪 FitPartner</div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">🏠 <span>Главная</span></a>
+      <a href="partners.html" class="nav-link">🔍 <span>Партнёры</span></a>
+      <a href="messages.html" class="nav-link">💬 <span>Сообщения</span></a>
+      <a href="subscription.html" class="nav-link">⭐ <span>Подписка</span></a>
+      <a href="profile.html" class="nav-link active">👤 <span>Профиль</span></a>
+      <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper container" style="padding-top: 88px; padding-bottom: 60px; max-width: 800px;">
+    <div class="alert-box"></div>
+
+    <div id="profileContent" class="loading-screen"><div class="loader"></div></div>
+
+    <!-- РЕДАКТИРОВАНИЕ -->
+    <div id="editSection" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <h2 style="font-size: 24px; font-weight: 700;">✏️ Редактировать профиль</h2>
+        <button class="btn btn-ghost btn-sm" onclick="cancelEdit()">Отмена</button>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Имя</label>
+            <input type="text" id="eName" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Возраст</label>
+            <input type="number" id="eAge" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Телефон</label>
+            <input type="tel" id="ePhone" class="form-input" placeholder="+7...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Район</label>
+            <select id="eDistrict" class="form-select">
+              <option>Алатауский</option><option>Алмалинский</option><option>Ауэзовский</option>
+              <option>Бостандыкский</option><option>Жетысуский</option><option>Медеуский</option>
+              <option>Наурызбайский</option><option>Турксибский</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Уровень подготовки</label>
+          <select id="eLevel" class="form-select">
+            <option value="beginner">Новичок</option>
+            <option value="intermediate">Средний</option>
+            <option value="advanced">Продвинутый</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Спортзал</label>
+          <input type="text" id="eGym" class="form-input" placeholder="Название или адрес зала">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Цели</label>
+          <div class="tags-selector" id="eGoals">
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">⚖️ Похудение</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">💪 Набор мышц</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">🏃 Выносливость</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">🤸 Гибкость</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">✨ Общий тонус</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">❤️ Кардио</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">График</label>
+          <div class="tags-selector" id="eSchedule">
+            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🌅 Утро</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🌆 Вечер</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">📅 Выходные</div>
+            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🕐 Обед</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">О себе</label>
+          <textarea id="eBio" class="form-textarea"></textarea>
+        </div>
+        <button class="btn btn-primary btn-full" id="saveProfileBtn" onclick="saveProfile()">💾 Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    if (!requireAuth()) throw 0;
+    let currentUser = null;
+    const editTags = { goals: [], schedule: [] };
+
+    (async () => {
+      try {
+        const { user } = await Auth.me();
+        currentUser = user;
+        renderProfile(user);
+      } catch (e) { showAlert(e.message); }
+    })();
+
+    function renderProfile(u) {
+      document.getElementById('profileContent').innerHTML = `
+        <div class="profile-header">
+          <div class="profile-avatar-big">${getAvatar(u.name)}</div>
+          <div style="flex:1;">
+            <div class="profile-name">${u.name} ${u.isSubscribed ? (u.subscriptionPlan === 'premium' ? '⭐' : '✅') : ''}</div>
+            <div class="profile-meta">
+              📍 ${u.district || 'Алматы'} · ${levelLabel[u.fitnessLevel] || 'Новичок'}
+              ${u.age ? ` · 🎂 ${u.age} лет` : ''}
+              ${u.gym ? ` · 🏟 ${u.gym}` : ''}
+            </div>
+            ${u.bio ? `<div style="color: var(--muted); font-size: 15px; margin-top: 8px; max-width: 500px;">${u.bio}</div>` : ''}
+            <div class="profile-tags" style="margin-top: 12px;">
+              ${(u.goals||[]).map(g => `<span class="badge badge-blue">${g}</span>`).join('')}
+              ${(u.schedule||[]).map(s => `<span class="badge badge-purple">${s}</span>`).join('')}
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startEdit()">✏️ Редактировать</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Информация</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div><div class="filter-label">Email</div><div>${u.email}</div></div>
+            <div><div class="filter-label">Телефон</div><div>${u.phone || 'Не указан'}</div></div>
+            <div><div class="filter-label">Район</div><div>${u.district || 'Не указан'}</div></div>
+            <div><div class="filter-label">Уровень</div><div>${levelLabel[u.fitnessLevel]||'—'}</div></div>
+            <div><div class="filter-label">Подписка</div><div>${u.isSubscribed ? `${u.subscriptionPlan === 'premium' ? '⭐ Premium' : '✅ Basic'} до ${new Date(u.subscriptionExpiry).toLocaleDateString('ru')}` : '🔓 Базовый'}</div></div>
+            <div><div class="filter-label">Дата регистрации</div><div>${new Date(u.createdAt).toLocaleDateString('ru-RU')}</div></div>
+          </div>
+          ${!u.isSubscribed ? `<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <a href="subscription.html" class="btn btn-primary btn-sm">⭐ Оформить подписку</a>
+          </div>` : ''}
+        </div>
+      `;
+    }
+
+    function startEdit() {
+      if (!currentUser) return;
+      document.getElementById('profileContent').style.display = 'none';
+      document.getElementById('editSection').style.display = 'block';
+      const u = currentUser;
+      document.getElementById('eName').value = u.name || '';
+      document.getElementById('eAge').value = u.age || '';
+      document.getElementById('ePhone').value = u.phone || '';
+      document.getElementById('eDistrict').value = u.district || 'Алмалинский';
+      document.getElementById('eLevel').value = u.fitnessLevel || 'beginner';
+      document.getElementById('eGym').value = u.gym || '';
+      document.getElementById('eBio').value = u.bio || '';
+      editTags.goals = [...(u.goals || [])];
+      editTags.schedule = [...(u.schedule || [])];
+      document.querySelectorAll('#eGoals .tag-btn').forEach(btn => {
+        const val = btn.textContent.replace(/[^а-яА-ЯёЁ\s]/g, '').trim();
+        if (editTags.goals.some(g => g.includes(val) || val.includes(g))) btn.classList.add('selected');
+      });
+      document.querySelectorAll('#eSchedule .tag-btn').forEach(btn => {
+        const val = btn.textContent.replace(/[^а-яА-ЯёЁ\s]/g, '').trim();
+        if (editTags.schedule.some(s => s.includes(val) || val.includes(s))) btn.classList.add('selected');
+      });
+    }
+
+    function cancelEdit() {
+      document.getElementById('profileContent').style.display = 'block';
+      document.getElementById('editSection').style.display = 'none';
+    }
+
+    function toggleEditTag(el, type) {
+      el.classList.toggle('selected');
+      const val = el.textContent.replace(/[^\wа-яА-ЯёЁ\s]/gu, '').trim();
+      if (el.classList.contains('selected')) editTags[type].push(el.textContent.trim());
+      else editTags[type] = editTags[type].filter(t => t !== el.textContent.trim());
+    }
+
+    async function saveProfile() {
+      const btn = document.getElementById('saveProfileBtn');
+      setBtn(btn, true);
+      try {
+        const { user } = await Auth.updateProfile({
+          name: document.getElementById('eName').value.trim(),
+          age: parseInt(document.getElementById('eAge').value) || undefined,
+          phone: document.getElementById('ePhone').value.trim() || undefined,
+          district: document.getElementById('eDistrict').value,
+          fitnessLevel: document.getElementById('eLevel').value,
+          gym: document.getElementById('eGym').value.trim() || undefined,
+          bio: document.getElementById('eBio').value.trim() || undefined,
+          goals: editTags.goals,
+          schedule: editTags.schedule
+        });
+        currentUser = user;
+        localStorage.setItem('fp_user', JSON.stringify({ ...getUser(), name: user.name, district: user.district }));
+        renderProfile(user);
+        cancelEdit();
+        showAlert('Профиль обновлён!', 'success');
+      } catch (e) {
+        showAlert(e.message);
+      } finally {
+        setBtn(btn, false, '💾 Сохранить изменения');
+      }
+    }
+  </script>
+</body>
+</html>
