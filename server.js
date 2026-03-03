@@ -18,7 +18,7 @@ connectDB();
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend')));
+//app.use(express.static(path.join(__dirname, '../frontend')));
 
 // API маршруты
 // Логирование всех запросов к /api/auth
@@ -58,10 +58,9 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
-});
-
+//app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/pages/index.html'));
+// });
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
