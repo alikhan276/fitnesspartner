@@ -1,11 +1,13 @@
 const { Pool } = require('pg');
 
+// Если есть DATABASE_URL (Railway), используем её, иначе локальные переменные
 const pool = new Pool({
-  user: process.env.DB_USER,                     // postgres
-  host: process.env.DB_HOST,                     // localhost
-  database: process.env.DB_NAME,                 // fitpartner
-  password: String(process.env.DB_PASSWORD),     // 123456
-  port: Number(process.env.DB_PORT),             // 5432
+  connectionString: process.env.DATABASE_URL || undefined,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD ? String(process.env.DB_PASSWORD) : undefined,
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
