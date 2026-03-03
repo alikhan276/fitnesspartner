@@ -2,83 +2,103 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const { pool } = require('../config/db');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
 const genToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
 
-// РЕГИСТРАЦИЯ
+// POST /api/auth/register
 router.post('/register', [
   body('name').trim().notEmpty().withMessage('Имя обязательно'),
   body('email').isEmail().withMessage('Некорректный email'),
   body('password').isLength({ min: 6 }).withMessage('Пароль минимум 6 символов')
 ], async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, message: errors.array()[0].msg });
+  }
 
   try {
-    const { name, email, password, age, gender, district, fitnessLevel, goals, schedule, gym, bio } = req.body;
-    const user = await User.create({ name, email, password, age, gender, district, fitnessLevel, goals, schedule, gym, bio });
-    const token = genToken(user._id);
-    res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, isSubscribed: user.isSubscribed, subscriptionPlan: user.subscriptionPlan } });
+    const existing = await User.findByEmail(req.body.email);
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Email уже занят' });
+    }
+
+    const user = await User.create(req.body);
+    const token = genToken(user.id);
+
+    res.status(201).json({ success: true, token, user: User.safe(user) });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.code === 11000 ? 'Email уже занят' : err.message });
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// ВХОД
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ success: false, message: 'Введите email и пароль' });
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.matchPassword(password))) {
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Введите email и пароль' });
+    }
+
+    const user = await User.findByEmail(email);
+    if (!user) {
       return res.status(401).json({ success: false, message: 'Неверный email или пароль' });
     }
-    user.isOnline = true;
-    user.lastSeen = new Date();
-    await user.save();
-    const token = genToken(user._id);
-    res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, isSubscribed: user.isSubscribed, subscriptionPlan: user.subscriptionPlan, district: user.district } });
+
+    const isMatch = await User.checkPassword(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Неверный email или пароль' });
+    }
+
+    await pool.query('UPDATE users SET is_online=TRUE, last_seen=NOW() WHERE id=$1', [user.id]);
+
+    const token = genToken(user.id);
+    res.json({ success: true, token, user: User.safe(user) });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// МОЙ ПРОФИЛЬ
+// GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
-  res.json({ success: true, user: req.user });
+  res.json({ success: true, user: User.safe(req.user) });
 });
 
-// ОБНОВИТЬ ПРОФИЛЬ
+// PUT /api/auth/profile
 router.put('/profile', protect, async (req, res) => {
   try {
-    const allowed = ['name', 'age', 'gender', 'district', 'fitnessLevel', 'goals', 'schedule', 'gym', 'bio', 'phone'];
-    const updates = {};
-    allowed.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
-    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true, runValidators: true });
-    res.json({ success: true, user });
+    const user = await User.update(req.user.id, req.body);
+    res.json({ success: true, user: User.safe(user) });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// ПОДПИСКА (имитация Kaspi оплаты)
+// POST /api/auth/subscribe
 router.post('/subscribe', protect, async (req, res) => {
   try {
-    const { plan, kaspiPhone } = req.body;
-    if (!kaspiPhone) return res.status(400).json({ success: false, message: 'Укажите номер Kaspi' });
+    const { kaspiPhone } = req.body;
+    if (!kaspiPhone) {
+      return res.status(400).json({ success: false, message: 'Укажите номер Kaspi' });
+    }
 
     const expiry = new Date();
-    plan === 'premium' ? expiry.setMonth(expiry.getMonth() + 3) : expiry.setMonth(expiry.getMonth() + 1);
+    expiry.setMonth(expiry.getMonth() + 1);
 
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      isSubscribed: true,
-      subscriptionPlan: plan || 'basic',
-      subscriptionExpiry: expiry
-    }, { new: true });
+    const result = await pool.query(
+      `UPDATE users SET is_subscribed=TRUE, subscription_plan='basic', subscription_expiry=$1
+       WHERE id=$2 RETURNING *`,
+      [expiry, req.user.id]
+    );
 
-    res.json({ success: true, message: `Подписка ${plan} активирована до ${expiry.toLocaleDateString('ru')}!`, user });
+    res.json({
+      success: true,
+      message: `✅ Подписка активирована до ${expiry.toLocaleDateString('ru-RU')}!`,
+      user: User.safe(result.rows[0])
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

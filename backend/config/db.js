@@ -1,66 +1,59 @@
-// config/db.js
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
 
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
-/**
- * connectDB({ retries = 5 })
- * - пытается подключиться с экспоненциальным бэкоффом
- * - логирует события подключения/отключения/ошибки
- */
-const connectDB = async ({ retries = 5 } = {}) => {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    throw new Error('MONGODB_URI не задан в окружении');
-  }
-
-  mongoose.connection.on('connected', () => {
-    console.log(`✅ MongoDB connected: ${mongoose.connection.host}`);
-  });
-
-  mongoose.connection.on('error', (err) => {
-    console.error('❌ MongoDB connection error:', err && err.message ? err.message : err);
-  });
-
-  mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️ MongoDB disconnected');
-  });
-
-  let attempt = 0;
-  while (attempt <= retries) {
-    try {
-      // опции не всегда обязательны для новых версий mongoose, но не вредят
-      await mongoose.connect(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      // при успешном подключении возвращаем управление
-      return;
-    } catch (err) {
-      attempt += 1;
-      const isLast = attempt > retries;
-      console.error(`❌ Ошибка подключения к MongoDB (попытка ${attempt}/${retries + 1}):`, err.message);
-      if (isLast) {
-        // бросаем дальше — вызывающая сторона решит, exit или retry по-другому
-        throw err;
-      }
-      // экспоненциальная задержка: 500ms * 2^(attempt-1)
-      const delay = 500 * Math.pow(2, attempt - 1);
-      console.log(`Повтор через ${delay}ms...`);
-      await sleep(delay);
-    }
+const connectDB = async () => {
+  try {
+    const client = await pool.connect();
+    console.log('✅ PostgreSQL подключена');
+    await initTables(client);
+    client.release();
+  } catch (error) {
+    console.error('❌ Ошибка БД:', error.message);
+    process.exit(1);
   }
 };
 
-// Graceful shutdown: on process termination close mongoose connection
-process.on('SIGINT', async () => {
-  try {
-    await mongoose.connection.close(false);
-    console.log('MongoDB connection closed due to app termination (SIGINT)');
-    process.exit(0);
-  } catch (e) {
-    process.exit(1);
-  }
-});
+const initTables = async (client) => {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(150) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      phone VARCHAR(20),
+      age INTEGER,
+      gender VARCHAR(10),
+      district VARCHAR(50) DEFAULT 'Алмалинский',
+      fitness_level VARCHAR(20) DEFAULT 'beginner',
+      goals TEXT[] DEFAULT '{}',
+      schedule TEXT[] DEFAULT '{}',
+      gym VARCHAR(150),
+      bio TEXT,
+      is_subscribed BOOLEAN DEFAULT FALSE,
+      subscription_expiry TIMESTAMP,
+      subscription_plan VARCHAR(20) DEFAULT 'none',
+      is_online BOOLEAN DEFAULT FALSE,
+      last_seen TIMESTAMP DEFAULT NOW(),
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
 
-module.exports = connectDB;
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id SERIAL PRIMARY KEY,
+      from_user INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      to_user INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      text TEXT NOT NULL,
+      read BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  console.log('✅ Таблицы готовы');
+};
+
+module.exports = { pool, connectDB };

@@ -3,51 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мой профиль — FitPartner</title>
+  <title>Профиль — FitPartner</title>
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-logo">💪 FitPartner</div>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">🏠 <span>Главная</span></a>
-      <a href="partners.html" class="nav-link">🔍 <span>Партнёры</span></a>
-      <a href="messages.html" class="nav-link">💬 <span>Сообщения</span></a>
+      <a href="dashboard.html"    class="nav-link">🏠 <span>Главная</span></a>
+      <a href="partners.html"     class="nav-link">🔍 <span>Партнёры</span></a>
+      <a href="messages.html"     class="nav-link">💬 <span>Сообщения</span></a>
       <a href="subscription.html" class="nav-link">⭐ <span>Подписка</span></a>
-      <a href="profile.html" class="nav-link active">👤 <span>Профиль</span></a>
+      <a href="profile.html"      class="nav-link active">👤 <span>Профиль</span></a>
       <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
     </div>
   </nav>
 
-  <div class="page-wrapper container" style="padding-top: 88px; padding-bottom: 60px; max-width: 800px;">
+  <div class="page-wrapper container" style="padding-top:88px;padding-bottom:60px;max-width:800px;">
     <div class="alert-box"></div>
+    <div id="profileView"><div class="loading-screen"><div class="loader"></div></div></div>
 
-    <div id="profileContent" class="loading-screen"><div class="loader"></div></div>
-
-    <!-- РЕДАКТИРОВАНИЕ -->
-    <div id="editSection" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
-        <h2 style="font-size: 24px; font-weight: 700;">✏️ Редактировать профиль</h2>
+    <!-- ФОРМА РЕДАКТИРОВАНИЯ -->
+    <div id="editForm" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:700;">✏️ Редактировать профиль</h2>
         <button class="btn btn-ghost btn-sm" onclick="cancelEdit()">Отмена</button>
       </div>
       <div class="card">
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Имя</label>
-            <input type="text" id="eName" class="form-input">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Возраст</label>
-            <input type="number" id="eAge" class="form-input">
-          </div>
+          <div class="form-group"><label class="form-label">Имя</label><input type="text" id="eName" class="form-input"></div>
+          <div class="form-group"><label class="form-label">Возраст</label><input type="number" id="eAge" class="form-input"></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Телефон</label>
-            <input type="tel" id="ePhone" class="form-input" placeholder="+7...">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Район</label>
+          <div class="form-group"><label class="form-label">Телефон</label><input type="tel" id="ePhone" class="form-input" placeholder="+7..."></div>
+          <div class="form-group"><label class="form-label">Район</label>
             <select id="eDistrict" class="form-select">
               <option>Алатауский</option><option>Алмалинский</option><option>Ауэзовский</option>
               <option>Бостандыкский</option><option>Жетысуский</option><option>Медеуский</option>
@@ -55,43 +44,36 @@
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Уровень подготовки</label>
+        <div class="form-group"><label class="form-label">Уровень</label>
           <select id="eLevel" class="form-select">
             <option value="beginner">Новичок</option>
             <option value="intermediate">Средний</option>
             <option value="advanced">Продвинутый</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Спортзал</label>
-          <input type="text" id="eGym" class="form-input" placeholder="Название или адрес зала">
-        </div>
+        <div class="form-group"><label class="form-label">Спортзал</label><input type="text" id="eGym" class="form-input" placeholder="Название зала"></div>
         <div class="form-group">
           <label class="form-label">Цели</label>
           <div class="tags-selector" id="eGoals">
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">⚖️ Похудение</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">💪 Набор мышц</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">🏃 Выносливость</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">🤸 Гибкость</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">✨ Общий тонус</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'goals')">❤️ Кардио</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">⚖️ Похудение</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">💪 Набор мышц</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">🏃 Выносливость</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">🤸 Гибкость</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">✨ Общий тонус</div>
+            <div class="tag-btn" onclick="toggleTag(this,'goals')">❤️ Кардио</div>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">График</label>
           <div class="tags-selector" id="eSchedule">
-            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🌅 Утро</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🌆 Вечер</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">📅 Выходные</div>
-            <div class="tag-btn" onclick="toggleEditTag(this,'schedule')">🕐 Обед</div>
+            <div class="tag-btn" onclick="toggleTag(this,'schedule')">🌅 Утро</div>
+            <div class="tag-btn" onclick="toggleTag(this,'schedule')">🌆 Вечер</div>
+            <div class="tag-btn" onclick="toggleTag(this,'schedule')">📅 Выходные</div>
+            <div class="tag-btn" onclick="toggleTag(this,'schedule')">🕐 Обед</div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">О себе</label>
-          <textarea id="eBio" class="form-textarea"></textarea>
-        </div>
-        <button class="btn btn-primary btn-full" id="saveProfileBtn" onclick="saveProfile()">💾 Сохранить изменения</button>
+        <div class="form-group"><label class="form-label">О себе</label><textarea id="eBio" class="form-textarea"></textarea></div>
+        <button class="btn btn-primary btn-full" id="saveBtn" onclick="saveProfile()">💾 Сохранить</button>
       </div>
     </div>
   </div>
@@ -99,116 +81,100 @@
   <script src="../js/api.js"></script>
   <script>
     if (!requireAuth()) throw 0;
-    let currentUser = null;
-    const editTags = { goals: [], schedule: [] };
+    let me = null;
+    const etags = { goals: [], schedule: [] };
 
     (async () => {
       try {
         const { user } = await Auth.me();
-        currentUser = user;
+        me = user;
         renderProfile(user);
-      } catch (e) { showAlert(e.message); }
+      } catch(e) { showAlert(e.message); }
     })();
 
     function renderProfile(u) {
-      document.getElementById('profileContent').innerHTML = `
+      document.getElementById('profileView').innerHTML = `
         <div class="profile-header">
           <div class="profile-avatar-big">${getAvatar(u.name)}</div>
           <div style="flex:1;">
-            <div class="profile-name">${u.name} ${u.isSubscribed ? (u.subscriptionPlan === 'premium' ? '⭐' : '✅') : ''}</div>
-            <div class="profile-meta">
-              📍 ${u.district || 'Алматы'} · ${levelLabel[u.fitnessLevel] || 'Новичок'}
-              ${u.age ? ` · 🎂 ${u.age} лет` : ''}
-              ${u.gym ? ` · 🏟 ${u.gym}` : ''}
-            </div>
-            ${u.bio ? `<div style="color: var(--muted); font-size: 15px; margin-top: 8px; max-width: 500px;">${u.bio}</div>` : ''}
-            <div class="profile-tags" style="margin-top: 12px;">
-              ${(u.goals||[]).map(g => `<span class="badge badge-blue">${g}</span>`).join('')}
-              ${(u.schedule||[]).map(s => `<span class="badge badge-purple">${s}</span>`).join('')}
+            <div class="profile-name">${u.name} ${u.is_subscribed?'⭐':''}</div>
+            <div class="profile-meta">📍 ${u.district||'Алматы'} · ${levelLabel[u.fitness_level]||'Новичок'}${u.age?' · 🎂 '+u.age+' лет':''}${u.gym?' · 🏟 '+u.gym:''}</div>
+            ${u.bio?'<div style="color:var(--muted);font-size:15px;margin-top:8px;">'+u.bio+'</div>':''}
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+              ${(u.goals||[]).map(g=>'<span class="badge badge-blue">'+g+'</span>').join('')}
+              ${(u.schedule||[]).map(s=>'<span class="badge badge-purple">'+s+'</span>').join('')}
             </div>
           </div>
-          <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startEdit()">✏️ Редактировать</button>
+          <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="startEdit()">✏️ Изменить</button>
         </div>
-
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">📊 Информация</div>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="card-title" style="margin-bottom:20px;">📊 Информация</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div><div class="filter-label">Email</div><div>${u.email}</div></div>
-            <div><div class="filter-label">Телефон</div><div>${u.phone || 'Не указан'}</div></div>
-            <div><div class="filter-label">Район</div><div>${u.district || 'Не указан'}</div></div>
-            <div><div class="filter-label">Уровень</div><div>${levelLabel[u.fitnessLevel]||'—'}</div></div>
-            <div><div class="filter-label">Подписка</div><div>${u.isSubscribed ? `${u.subscriptionPlan === 'premium' ? '⭐ Premium' : '✅ Basic'} до ${new Date(u.subscriptionExpiry).toLocaleDateString('ru')}` : '🔓 Базовый'}</div></div>
-            <div><div class="filter-label">Дата регистрации</div><div>${new Date(u.createdAt).toLocaleDateString('ru-RU')}</div></div>
+            <div><div class="filter-label">Телефон</div><div>${u.phone||'Не указан'}</div></div>
+            <div><div class="filter-label">Район</div><div>${u.district||'Не указан'}</div></div>
+            <div><div class="filter-label">Уровень</div><div>${levelLabel[u.fitness_level]||'—'}</div></div>
+            <div><div class="filter-label">Подписка</div><div>${u.is_subscribed?'⭐ Активна до '+new Date(u.subscription_expiry).toLocaleDateString('ru-RU'):'🔓 Не активна'}</div></div>
+            <div><div class="filter-label">Регистрация</div><div>${new Date(u.created_at).toLocaleDateString('ru-RU')}</div></div>
           </div>
-          ${!u.isSubscribed ? `<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-            <a href="subscription.html" class="btn btn-primary btn-sm">⭐ Оформить подписку</a>
-          </div>` : ''}
-        </div>
-      `;
+          ${!u.is_subscribed?'<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);"><a href="subscription.html" class="btn btn-primary btn-sm">⭐ Оформить подписку — 1 000 ₸</a></div>':''}
+        </div>`;
     }
 
     function startEdit() {
-      if (!currentUser) return;
-      document.getElementById('profileContent').style.display = 'none';
-      document.getElementById('editSection').style.display = 'block';
-      const u = currentUser;
-      document.getElementById('eName').value = u.name || '';
-      document.getElementById('eAge').value = u.age || '';
-      document.getElementById('ePhone').value = u.phone || '';
+      const u = me;
+      document.getElementById('profileView').style.display = 'none';
+      document.getElementById('editForm').style.display = 'block';
+      document.getElementById('eName').value     = u.name || '';
+      document.getElementById('eAge').value      = u.age || '';
+      document.getElementById('ePhone').value    = u.phone || '';
       document.getElementById('eDistrict').value = u.district || 'Алмалинский';
-      document.getElementById('eLevel').value = u.fitnessLevel || 'beginner';
-      document.getElementById('eGym').value = u.gym || '';
-      document.getElementById('eBio').value = u.bio || '';
-      editTags.goals = [...(u.goals || [])];
-      editTags.schedule = [...(u.schedule || [])];
-      document.querySelectorAll('#eGoals .tag-btn').forEach(btn => {
-        const val = btn.textContent.replace(/[^а-яА-ЯёЁ\s]/g, '').trim();
-        if (editTags.goals.some(g => g.includes(val) || val.includes(g))) btn.classList.add('selected');
-      });
-      document.querySelectorAll('#eSchedule .tag-btn').forEach(btn => {
-        const val = btn.textContent.replace(/[^а-яА-ЯёЁ\s]/g, '').trim();
-        if (editTags.schedule.some(s => s.includes(val) || val.includes(s))) btn.classList.add('selected');
+      document.getElementById('eLevel').value    = u.fitness_level || 'beginner';
+      document.getElementById('eGym').value      = u.gym || '';
+      document.getElementById('eBio').value      = u.bio || '';
+      etags.goals    = [...(u.goals||[])];
+      etags.schedule = [...(u.schedule||[])];
+      document.querySelectorAll('#eGoals .tag-btn, #eSchedule .tag-btn').forEach(btn => {
+        const type = btn.closest('#eGoals') ? 'goals' : 'schedule';
+        if (etags[type].includes(btn.textContent.trim())) btn.classList.add('selected');
       });
     }
 
     function cancelEdit() {
-      document.getElementById('profileContent').style.display = 'block';
-      document.getElementById('editSection').style.display = 'none';
+      document.getElementById('profileView').style.display = 'block';
+      document.getElementById('editForm').style.display = 'none';
     }
 
-    function toggleEditTag(el, type) {
+    function toggleTag(el, type) {
       el.classList.toggle('selected');
-      const val = el.textContent.replace(/[^\wа-яА-ЯёЁ\s]/gu, '').trim();
-      if (el.classList.contains('selected')) editTags[type].push(el.textContent.trim());
-      else editTags[type] = editTags[type].filter(t => t !== el.textContent.trim());
+      const val = el.textContent.trim();
+      if (el.classList.contains('selected')) etags[type].push(val);
+      else etags[type] = etags[type].filter(t => t !== val);
     }
 
     async function saveProfile() {
-      const btn = document.getElementById('saveProfileBtn');
+      const btn = document.getElementById('saveBtn');
       setBtn(btn, true);
       try {
         const { user } = await Auth.updateProfile({
-          name: document.getElementById('eName').value.trim(),
-          age: parseInt(document.getElementById('eAge').value) || undefined,
-          phone: document.getElementById('ePhone').value.trim() || undefined,
-          district: document.getElementById('eDistrict').value,
+          name:         document.getElementById('eName').value.trim(),
+          age:          parseInt(document.getElementById('eAge').value) || undefined,
+          phone:        document.getElementById('ePhone').value.trim() || undefined,
+          district:     document.getElementById('eDistrict').value,
           fitnessLevel: document.getElementById('eLevel').value,
-          gym: document.getElementById('eGym').value.trim() || undefined,
-          bio: document.getElementById('eBio').value.trim() || undefined,
-          goals: editTags.goals,
-          schedule: editTags.schedule
+          gym:          document.getElementById('eGym').value.trim() || undefined,
+          bio:          document.getElementById('eBio').value.trim() || undefined,
+          goals:        etags.goals,
+          schedule:     etags.schedule
         });
-        currentUser = user;
-        localStorage.setItem('fp_user', JSON.stringify({ ...getUser(), name: user.name, district: user.district }));
+        me = user;
         renderProfile(user);
         cancelEdit();
         showAlert('Профиль обновлён!', 'success');
-      } catch (e) {
+      } catch(e) {
         showAlert(e.message);
       } finally {
-        setBtn(btn, false, '💾 Сохранить изменения');
+        setBtn(btn, false, '💾 Сохранить');
       }
     }
   </script>

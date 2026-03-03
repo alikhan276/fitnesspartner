@@ -10,107 +10,90 @@
   <nav class="navbar">
     <div class="nav-logo">💪 FitPartner</div>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">🏠 <span>Главная</span></a>
-      <a href="partners.html" class="nav-link">🔍 <span>Партнёры</span></a>
-      <a href="messages.html" class="nav-link">💬 <span>Сообщения</span></a>
+      <a href="dashboard.html"    class="nav-link">🏠 <span>Главная</span></a>
+      <a href="partners.html"     class="nav-link">🔍 <span>Партнёры</span></a>
+      <a href="messages.html"     class="nav-link">💬 <span>Сообщения</span></a>
       <a href="subscription.html" class="nav-link active">⭐ <span>Подписка</span></a>
-      <a href="profile.html" class="nav-link">👤 <span>Профиль</span></a>
+      <a href="profile.html"      class="nav-link">👤 <span>Профиль</span></a>
       <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
     </div>
   </nav>
 
-  <div class="page-wrapper container" style="padding-top: 88px; padding-bottom: 60px;">
-    <div style="text-align:center; margin-bottom: 48px;">
-      <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
-      <h1 style="font-size: 40px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">Выберите подписку</h1>
-      <p style="color: var(--muted); font-size: 18px; max-width: 500px; margin: 0 auto;">Получите полный доступ к FitPartner и найдите идеального партнёра</p>
+  <div class="page-wrapper container" style="padding-top:88px;padding-bottom:60px;max-width:680px;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:56px;margin-bottom:16px;">⭐</div>
+      <h1 style="font-size:42px;font-weight:900;letter-spacing:-1px;margin-bottom:12px;">Полный доступ</h1>
+      <p style="color:var(--muted);font-size:17px;max-width:420px;margin:0 auto;line-height:1.7;">Находите партнёров без ограничений и общайтесь сколько угодно</p>
     </div>
 
-    <div id="currentSub" style="display:none;" class="alert alert-success" style="max-width: 600px; margin: 0 auto 32px;">
-      ✅ У вас активна подписка <strong id="subPlanName"></strong> до <strong id="subExpiry"></strong>
+    <div id="activeSub" style="display:none;margin-bottom:28px;">
+      <div class="alert alert-success" style="font-size:16px;padding:18px 24px;">✅ У вас активна подписка до <strong id="subExpiry"></strong></div>
+    </div>
+    <div class="alert-box" style="margin-bottom:24px;"></div>
+
+    <!-- КАРТОЧКА -->
+    <div style="background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(124,58,237,0.08));border:1px solid rgba(0,229,255,0.4);border-radius:24px;padding:40px;margin-bottom:32px;position:relative;">
+      <span class="badge badge-blue" style="position:absolute;top:20px;right:20px;font-size:13px;padding:6px 16px;">1 месяц</span>
+      <div style="font-size:13px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">FitPartner Premium</div>
+      <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:28px;">
+        <div style="font-size:72px;font-weight:900;line-height:1;background:var(--gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">1 000</div>
+        <div style="color:var(--muted);font-size:20px;padding-bottom:10px;">₸ / мес</div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px;"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,255,148,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;">✓</span>Неограниченный просмотр анкет</li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px;"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,255,148,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;">✓</span>Личные сообщения без ограничений</li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px;"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,255,148,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;">✓</span>Фильтрация по всем районам Алматы</li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px;"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,255,148,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;">✓</span>Значок ⭐ в профиле</li>
+        <li style="display:flex;align-items:center;gap:12px;font-size:16px;"><span style="width:28px;height:28px;border-radius:50%;background:rgba(0,255,148,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;">✓</span>Приоритет в результатах поиска</li>
+      </ul>
+      <button class="btn btn-primary btn-full btn-lg" id="subBtn" onclick="openPayment()">Оформить за 1 000 ₸</button>
     </div>
 
-    <div class="alert-box" style="max-width: 600px; margin: 0 auto 24px;"></div>
-
-    <div class="sub-grid">
-      <!-- FREE -->
-      <div class="sub-card">
-        <span class="badge badge-purple">Бесплатно</span>
-        <div class="sub-name" style="margin-top: 16px;">Базовый</div>
-        <div class="sub-price">0 <span>₸/мес</span></div>
-        <div class="sub-desc">Начните знакомиться с сервисом</div>
-        <ul class="sub-features">
-          <li>Просмотр 5 анкет в день</li>
-          <li>Базовые фильтры поиска</li>
-          <li>Ограниченный чат</li>
-        </ul>
-        <button class="btn btn-ghost btn-full" disabled>Текущий план</button>
-      </div>
-
-      <!-- BASIC -->
-      <div class="sub-card featured">
-        <span class="badge badge-blue" style="margin-bottom: 16px;">На месяц</span>
-        <div class="sub-name">Basic</div>
-        <div class="sub-price">2 900 <span>₸/мес</span></div>
-        <div class="sub-desc">Всё для поиска партнёра</div>
-        <ul class="sub-features">
-          <li>Неограниченный просмотр анкет</li>
-          <li>Полный доступ к фильтрам</li>
-          <li>Неограниченный чат</li>
-          <li>Приоритет в поиске</li>
-        </ul>
-        <button class="btn btn-primary btn-full" onclick="openPayment('basic', 2900)">Оплатить через Kaspi</button>
-      </div>
-
-      <!-- PREMIUM -->
-      <div class="sub-card">
-        <span class="badge badge-orange">3 месяца</span>
-        <div class="sub-name" style="margin-top: 16px;">Premium</div>
-        <div class="sub-price">6 500 <span>₸/3 мес</span></div>
-        <div class="sub-desc">Максимум возможностей</div>
-        <ul class="sub-features">
-          <li>Всё из Basic</li>
-          <li>Значок ⭐ в профиле</li>
-          <li>Статистика просмотров</li>
-          <li>Приоритетная поддержка</li>
-          <li>Скидка 25% vs Basic</li>
-        </ul>
-        <button class="btn btn-full" style="background: var(--orange); color:#fff;" onclick="openPayment('premium', 6500)">Оплатить через Kaspi</button>
+    <!-- КАК ОПЛАТИТЬ -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:20px;">💡 Как оплатить?</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,229,255,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;">1</div>
+          <div><div style="font-weight:700;margin-bottom:4px;">Откройте Kaspi.kz</div><div style="color:var(--muted);font-size:14px;">Перейдите в «Переводы» → «По номеру телефона»</div></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,229,255,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;">2</div>
+          <div><div style="font-weight:700;margin-bottom:4px;">Переведите 1 000 ₸</div><div style="color:var(--muted);font-size:14px;">На номер <strong style="color:var(--orange);font-size:18px;">8 747 210 52 70</strong></div></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,229,255,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;">3</div>
+          <div><div style="font-weight:700;margin-bottom:4px;">Подтвердите оплату</div><div style="color:var(--muted);font-size:14px;">Введите ваш номер Kaspi — подписка активируется сразу</div></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- KASPI МОДАЛ -->
   <div class="modal-overlay" id="kaspiModal">
-    <div class="modal" style="max-width: 460px;">
+    <div class="modal" style="max-width:460px;">
       <div class="modal-header">
-        <h2 class="modal-title">💳 Оплата через Kaspi</h2>
+        <h2 class="modal-title">💳 Оплата Kaspi</h2>
         <button class="modal-close" onclick="closePayment()">✕</button>
       </div>
-
-      <div class="kaspi-block" style="margin-bottom: 24px;">
-        <div class="kaspi-logo">Kaspi.kz</div>
-        <div style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Переведите оплату на номер:</div>
-        <div class="kaspi-num">+7 (777) 123-45-67</div>
-        <div class="kaspi-hint">Имя: FitPartner Almaty</div>
-        <div class="kaspi-hint">Сумма: <strong id="kaspiSum" style="color: var(--orange);">—</strong></div>
+      <div style="background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(255,107,53,0.05));border:1px solid rgba(255,107,53,0.35);border-radius:16px;padding:24px;margin-bottom:24px;">
+        <div style="font-size:13px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Kaspi.kz — Перевод по номеру</div>
+        <div style="font-size:15px;color:var(--muted);margin-bottom:6px;">Номер получателя:</div>
+        <div style="font-size:28px;font-weight:900;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">8 747 210 52 70</div>
+        <div style="font-size:14px;color:var(--muted);">Сумма:</div>
+        <div style="font-size:32px;font-weight:900;">1 000 ₸</div>
       </div>
-
-      <div class="alert" style="background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.2); color: var(--accent); margin-bottom: 20px;">
+      <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:14px;color:var(--accent);">
         ℹ️ После перевода введите ваш номер Kaspi для подтверждения
       </div>
-
       <div class="form-group">
-        <label class="form-label">Ваш номер Kaspi</label>
-        <input type="tel" id="kaspiPhone" class="form-input" placeholder="+7 777 000 00 00">
-        <div class="form-hint">Мы проверим перевод и активируем подписку</div>
+        <label class="form-label">Ваш номер Kaspi (с которого переводили)</label>
+        <input type="tel" id="kaspiPhone" class="form-input" placeholder="+7 747 000 00 00">
       </div>
-
-      <div id="paymentPlan" style="display:none;"></div>
-
+      <div id="modalAlerts"></div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closePayment()">Отмена</button>
-        <button class="btn btn-primary" id="confirmPayBtn" onclick="confirmPayment()">✅ Подтвердить оплату</button>
+        <button class="btn btn-primary" id="confirmBtn" onclick="confirmPayment()">✅ Подтвердить</button>
       </div>
     </div>
   </div>
@@ -118,55 +101,53 @@
   <script src="../js/api.js"></script>
   <script>
     if (!requireAuth()) throw 0;
-    let currentPlan = null;
-
     (async () => {
       try {
         const { user } = await Auth.me();
-        if (user.isSubscribed) {
-          document.getElementById('currentSub').style.display = 'block';
-          document.getElementById('subPlanName').textContent = user.subscriptionPlan === 'premium' ? 'Premium' : 'Basic';
-          document.getElementById('subExpiry').textContent = user.subscriptionExpiry
-            ? new Date(user.subscriptionExpiry).toLocaleDateString('ru-RU')
-            : '—';
+        if (user.is_subscribed && user.subscription_expiry) {
+          document.getElementById('activeSub').style.display = 'block';
+          document.getElementById('subExpiry').textContent = new Date(user.subscription_expiry).toLocaleDateString('ru-RU');
+          document.getElementById('subBtn').textContent = '🔄 Продлить подписку';
         }
-      } catch (e) {}
+      } catch(e) {}
     })();
 
-    function openPayment(plan, amount) {
-      currentPlan = plan;
-      document.getElementById('kaspiSum').textContent = amount.toLocaleString('ru') + ' ₸';
+    function openPayment() {
       document.getElementById('kaspiPhone').value = '';
+      document.getElementById('modalAlerts').innerHTML = '';
       document.getElementById('kaspiModal').classList.add('active');
+      setTimeout(() => document.getElementById('kaspiPhone').focus(), 300);
     }
 
-    function closePayment() {
-      document.getElementById('kaspiModal').classList.remove('active');
-    }
+    function closePayment() { document.getElementById('kaspiModal').classList.remove('active'); }
 
     async function confirmPayment() {
       const phone = document.getElementById('kaspiPhone').value.trim();
-      const btn = document.getElementById('confirmPayBtn');
-      if (!phone || phone.replace(/\D/g, '').length < 10) {
-        return showAlert('Введите корректный номер Kaspi');
+      const btn   = document.getElementById('confirmBtn');
+      const alerts = document.getElementById('modalAlerts');
+      if (!phone || phone.replace(/\D/g,'').length < 10) {
+        alerts.innerHTML = '<div class="alert alert-error">✕ Введите корректный номер Kaspi</div>';
+        return;
       }
       setBtn(btn, true);
+      alerts.innerHTML = '';
       try {
-        const { message, user } = await Auth.subscribe(currentPlan, phone);
-        localStorage.setItem('fp_user', JSON.stringify({ ...getUser(), isSubscribed: true, subscriptionPlan: currentPlan }));
+        const { message } = await Auth.subscribe(phone);
         closePayment();
         showAlert(message, 'success');
-        setTimeout(() => window.location.reload(), 1500);
-      } catch (e) {
-        showAlert(e.message);
+        document.getElementById('activeSub').style.display = 'block';
+        document.getElementById('subBtn').textContent = '🔄 Продлить подписку';
+        const { user } = await Auth.me();
+        if (user.subscription_expiry) document.getElementById('subExpiry').textContent = new Date(user.subscription_expiry).toLocaleDateString('ru-RU');
+      } catch(e) {
+        alerts.innerHTML = '<div class="alert alert-error">✕ ' + e.message + '</div>';
       } finally {
-        setBtn(btn, false, '✅ Подтвердить оплату');
+        setBtn(btn, false, '✅ Подтвердить');
       }
     }
 
-    document.getElementById('kaspiModal').addEventListener('click', e => {
-      if (e.target === e.currentTarget) closePayment();
-    });
+    document.getElementById('kaspiModal').addEventListener('click', e => { if (e.target===e.currentTarget) closePayment(); });
+    document.getElementById('kaspiPhone').addEventListener('keydown', e => { if (e.key==='Enter') confirmPayment(); });
   </script>
 </body>
 </html>

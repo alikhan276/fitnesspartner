@@ -12,10 +12,8 @@
       <div class="auth-box">
         <a href="index.html" class="auth-logo">💪 FitPartner Almaty</a>
         <h1 class="auth-title">С возвращением!</h1>
-        <p class="auth-sub">Войдите, чтобы найти своего партнёра</p>
-
+        <p class="auth-sub">Войдите в свой аккаунт</p>
         <div class="alert-box"></div>
-
         <div class="form-group">
           <label class="form-label">Email</label>
           <input type="email" id="email" class="form-input" placeholder="your@email.com">
@@ -24,33 +22,28 @@
           <label class="form-label">Пароль</label>
           <input type="password" id="password" class="form-input" placeholder="••••••••">
         </div>
-
         <button class="btn btn-primary btn-full" id="loginBtn" onclick="doLogin()">Войти</button>
-
-        <div class="auth-divider" style="margin-top: 24px;">или</div>
-        <p style="text-align:center; color: var(--muted); margin-top: 16px;">
-          Нет аккаунта? <a href="register.html" style="color: var(--accent); font-weight: 700; text-decoration: none;">Зарегистрируйтесь</a>
+        <p style="text-align:center;color:var(--muted);margin-top:20px;">
+          Нет аккаунта? <a href="register.html" style="color:var(--accent);font-weight:700;text-decoration:none;">Зарегистрируйтесь</a>
         </p>
       </div>
     </div>
   </div>
-
   <script src="../js/api.js"></script>
   <script>
     redirectAuth();
     document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
     async function doLogin() {
-      const email = document.getElementById('email').value.trim();
+      const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const btn = document.getElementById('loginBtn');
+      const btn      = document.getElementById('loginBtn');
       if (!email || !password) return showAlert('Заполните все поля');
       setBtn(btn, true);
       try {
         const data = await Auth.login(email, password);
         localStorage.setItem('fp_token', data.token);
         localStorage.setItem('fp_user', JSON.stringify(data.user));
-        showAlert('Вход выполнен! Перенаправление...', 'success');
+        showAlert('Вход выполнен!', 'success');
         setTimeout(() => window.location.href = 'dashboard.html', 800);
       } catch (e) {
         showAlert(e.message);

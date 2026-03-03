@@ -3,72 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Найти партнёра — FitPartner</title>
+  <title>Партнёры — FitPartner</title>
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-logo">💪 FitPartner</div>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">🏠 <span>Главная</span></a>
-      <a href="partners.html" class="nav-link active">🔍 <span>Партнёры</span></a>
-      <a href="messages.html" class="nav-link">💬 <span>Сообщения</span></a>
+      <a href="dashboard.html"    class="nav-link">🏠 <span>Главная</span></a>
+      <a href="partners.html"     class="nav-link active">🔍 <span>Партнёры</span></a>
+      <a href="messages.html"     class="nav-link">💬 <span>Сообщения</span></a>
       <a href="subscription.html" class="nav-link">⭐ <span>Подписка</span></a>
-      <a href="profile.html" class="nav-link">👤 <span>Профиль</span></a>
+      <a href="profile.html"      class="nav-link">👤 <span>Профиль</span></a>
       <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
     </div>
   </nav>
 
-  <div class="page-wrapper container" style="padding-top: 88px; padding-bottom: 40px;">
-    <div style="margin-bottom: 28px;">
-      <h1 style="font-size: 32px; font-weight: 900; letter-spacing: -1px;">🔍 Найти партнёра</h1>
-      <p style="color: var(--muted); margin-top: 4px;">Все участники из Алматы</p>
+  <div class="page-wrapper container" style="padding-top:88px;padding-bottom:40px;">
+    <div style="margin-bottom:28px;">
+      <h1 style="font-size:32px;font-weight:900;letter-spacing:-1px;">🔍 Найти партнёра</h1>
+      <p style="color:var(--muted);margin-top:4px;">Все участники из Алматы</p>
     </div>
-
     <div class="alert-box"></div>
 
-    <!-- ФИЛЬТРЫ -->
     <div class="filters-bar">
-      <div class="filter-group">
-        <div class="filter-label">Район</div>
-        <select id="fDistrict" class="filter-select" onchange="loadPartners()">
+      <div class="filter-group"><div class="filter-label">Район</div>
+        <select id="fDistrict" class="filter-select" onchange="load()">
           <option value="">Все районы</option>
           <option>Алатауский</option><option>Алмалинский</option><option>Ауэзовский</option>
           <option>Бостандыкский</option><option>Жетысуский</option><option>Медеуский</option>
           <option>Наурызбайский</option><option>Турксибский</option>
         </select>
       </div>
-      <div class="filter-group">
-        <div class="filter-label">Уровень</div>
-        <select id="fLevel" class="filter-select" onchange="loadPartners()">
+      <div class="filter-group"><div class="filter-label">Уровень</div>
+        <select id="fLevel" class="filter-select" onchange="load()">
           <option value="">Любой</option>
           <option value="beginner">Новичок</option>
           <option value="intermediate">Средний</option>
           <option value="advanced">Продвинутый</option>
         </select>
       </div>
-      <div class="filter-group">
-        <div class="filter-label">Пол</div>
-        <select id="fGender" class="filter-select" onchange="loadPartners()">
+      <div class="filter-group"><div class="filter-label">Пол</div>
+        <select id="fGender" class="filter-select" onchange="load()">
           <option value="">Любой</option>
           <option value="male">Мужской</option>
           <option value="female">Женский</option>
         </select>
       </div>
-      <div class="filter-group">
-        <div class="filter-label">График</div>
-        <select id="fSchedule" class="filter-select" onchange="loadPartners()">
+      <div class="filter-group"><div class="filter-label">График</div>
+        <select id="fSchedule" class="filter-select" onchange="load()">
           <option value="">Любой</option>
-          <option value="Утро">Утро</option>
-          <option value="Вечер">Вечер</option>
-          <option value="Выходные">Выходные</option>
-          <option value="Обед">Обед</option>
+          <option>Утро</option><option>Вечер</option><option>Выходные</option><option>Обед</option>
         </select>
       </div>
     </div>
 
-    <div id="count" style="color: var(--muted); font-size: 14px; margin-bottom: 20px;"></div>
-    <div class="partners-grid" id="partnersList"></div>
+    <div id="count" style="color:var(--muted);font-size:14px;margin-bottom:20px;"></div>
+    <div class="partners-grid" id="list"></div>
   </div>
 
   <!-- ПРОФИЛЬ МОДАЛ -->
@@ -89,107 +80,73 @@
   <script src="../js/api.js"></script>
   <script>
     if (!requireAuth()) throw 0;
-    let selectedUserId = null;
+    load();
 
-    loadPartners();
-
-    async function loadPartners() {
-      const list = document.getElementById('partnersList');
+    async function load() {
+      const list = document.getElementById('list');
       list.innerHTML = '<div class="loading-screen"><div class="loader"></div></div>';
       try {
-        const params = {};
+        const p = {};
         const d = document.getElementById('fDistrict').value;
         const l = document.getElementById('fLevel').value;
         const g = document.getElementById('fGender').value;
         const s = document.getElementById('fSchedule').value;
-        if (d) params.district = d;
-        if (l) params.fitnessLevel = l;
-        if (g) params.gender = g;
-        if (s) params.schedule = s;
-
-        const { users } = await Users.getAll(params);
-        document.getElementById('count').textContent = `Найдено: ${users.length} человек`;
-
-        if (!users.length) {
-          list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Никого не найдено</div><p>Попробуйте изменить фильтры</p></div>';
-          return;
-        }
-
+        if (d) p.district = d;
+        if (l) p.fitnessLevel = l;
+        if (g) p.gender = g;
+        if (s) p.schedule = s;
+        const { users } = await Users.getAll(p);
+        document.getElementById('count').textContent = 'Найдено: ' + users.length + ' человек';
+        if (!users.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Никого не найдено</div></div>'; return; }
         list.innerHTML = users.map(u => `
-          <div class="partner-card" onclick="openProfile('${u._id}')">
+          <div class="partner-card" onclick="openProfile(${u.id})">
             <div class="partner-card-top">
-              <div class="partner-avatar">${getAvatar(u.name)}${u.isOnline ? '<div class="partner-online-dot"></div>' : ''}</div>
+              <div class="partner-avatar">${getAvatar(u.name)}${u.is_online?'<div class="partner-online-dot"></div>':''}</div>
               <div>
                 <div class="partner-name">${u.name}</div>
-                <div class="partner-meta">📍 ${u.district || 'Алматы'} · ${levelLabel[u.fitnessLevel] || 'Новичок'}</div>
-                ${u.gym ? `<div class="partner-meta" style="margin-top:2px;">🏟 ${u.gym}</div>` : ''}
+                <div class="partner-meta">📍 ${u.district||'Алматы'} · ${levelLabel[u.fitness_level]||'Новичок'}</div>
+                ${u.gym?'<div class="partner-meta">🏟 '+u.gym+'</div>':''}
               </div>
             </div>
-            ${u.bio ? `<div class="partner-bio">${u.bio.slice(0, 100)}${u.bio.length > 100 ? '...' : ''}</div>` : ''}
+            ${u.bio?'<div class="partner-bio">'+u.bio.slice(0,100)+(u.bio.length>100?'...':'')+'</div>':''}
             <div class="partner-tags">
-              ${(u.goals || []).slice(0, 3).map(g => `<span class="badge badge-blue">${g}</span>`).join('')}
-              ${(u.schedule || []).slice(0, 2).map(s => `<span class="badge badge-purple">${s}</span>`).join('')}
-              ${u.isOnline ? '<span class="badge badge-online">● Онлайн</span>' : '<span class="badge badge-offline">○ Оффлайн</span>'}
+              ${(u.goals||[]).slice(0,3).map(g=>'<span class="badge badge-blue">'+g+'</span>').join('')}
+              ${(u.schedule||[]).slice(0,2).map(s=>'<span class="badge badge-purple">'+s+'</span>').join('')}
+              ${u.is_online?'<span class="badge badge-online">● Онлайн</span>':'<span class="badge badge-offline">○ Оффлайн</span>'}
             </div>
-            <div class="partner-actions" style="margin-top: 16px;">
-              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); writeMsg('${u._id}','${u.name}')">💬 Написать</button>
-              <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation(); openProfile('${u._id}')">Профиль →</button>
+            <div class="partner-actions">
+              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();writeMsg(${u.id},'${u.name}')">💬 Написать</button>
+              <button class="btn btn-sm btn-ghost"   onclick="event.stopPropagation();openProfile(${u.id})">Профиль →</button>
             </div>
-          </div>
-        `).join('');
-      } catch (e) {
-        showAlert(e.message);
-      }
+          </div>`).join('');
+      } catch (e) { showAlert(e.message); }
     }
 
     async function openProfile(id) {
-      selectedUserId = id;
       document.getElementById('profileModal').classList.add('active');
       document.getElementById('pmContent').innerHTML = '<div class="loading-screen"><div class="loader"></div></div>';
       try {
         const { user: u } = await Users.getById(id);
-        document.getElementById('pmName').textContent = `${getAvatar(u.name)} ${u.name}`;
+        document.getElementById('pmName').textContent = getAvatar(u.name) + ' ' + u.name;
         document.getElementById('pmContent').innerHTML = `
-          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom: 20px;">
-            <span class="badge badge-blue">📍 ${u.district || 'Алматы'}</span>
-            <span class="badge badge-purple">💪 ${levelLabel[u.fitnessLevel] || 'Новичок'}</span>
-            ${u.age ? `<span class="badge badge-orange">🎂 ${u.age} лет</span>` : ''}
-            ${u.isOnline ? '<span class="badge badge-online">● Онлайн</span>' : '<span class="badge badge-offline">○ Оффлайн</span>'}
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+            <span class="badge badge-blue">📍 ${u.district||'Алматы'}</span>
+            <span class="badge badge-purple">💪 ${levelLabel[u.fitness_level]||'Новичок'}</span>
+            ${u.age?'<span class="badge badge-orange">🎂 '+u.age+' лет</span>':''}
+            ${u.is_online?'<span class="badge badge-online">● Онлайн</span>':'<span class="badge badge-offline">○ Оффлайн</span>'}
           </div>
-          ${u.bio ? `<div style="color: var(--muted); margin-bottom: 20px; line-height: 1.6;">${u.bio}</div>` : ''}
-          ${u.gym ? `<div style="margin-bottom: 16px; font-size: 14px;">🏟 Зал: <strong>${u.gym}</strong></div>` : ''}
-          ${u.goals?.length ? `
-            <div style="margin-bottom: 16px;">
-              <div class="filter-label">Цели</div>
-              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-                ${u.goals.map(g => `<span class="badge badge-blue">${g}</span>`).join('')}
-              </div>
-            </div>
-          ` : ''}
-          ${u.schedule?.length ? `
-            <div>
-              <div class="filter-label">График тренировок</div>
-              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-                ${u.schedule.map(s => `<span class="badge badge-purple">${s}</span>`).join('')}
-              </div>
-            </div>
-          ` : ''}
+          ${u.bio?'<div style="color:var(--muted);margin-bottom:20px;line-height:1.6;">'+u.bio+'</div>':''}
+          ${u.gym?'<div style="margin-bottom:16px;font-size:14px;">🏟 Зал: <strong>'+u.gym+'</strong></div>':''}
+          ${(u.goals||[]).length?'<div style="margin-bottom:16px;"><div class="filter-label">Цели</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">'+(u.goals||[]).map(g=>'<span class="badge badge-blue">'+g+'</span>').join('')+'</div></div>':''}
+          ${(u.schedule||[]).length?'<div><div class="filter-label">График</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">'+(u.schedule||[]).map(s=>'<span class="badge badge-purple">'+s+'</span>').join('')+'</div></div>':''}
         `;
-        document.getElementById('pmMsgBtn').onclick = () => { closeProfile(); writeMsg(u._id, u.name); };
-      } catch (e) {}
+        document.getElementById('pmMsgBtn').onclick = () => { closeProfile(); writeMsg(u.id, u.name); };
+      } catch(e) {}
     }
 
-    function closeProfile() {
-      document.getElementById('profileModal').classList.remove('active');
-    }
-
-    function writeMsg(id, name) {
-      window.location.href = `messages.html?userId=${id}&userName=${encodeURIComponent(name)}`;
-    }
-
-    document.getElementById('profileModal').addEventListener('click', e => {
-      if (e.target === e.currentTarget) closeProfile();
-    });
+    function closeProfile() { document.getElementById('profileModal').classList.remove('active'); }
+    function writeMsg(id, name) { window.location.href = 'messages.html?userId='+id+'&userName='+encodeURIComponent(name); }
+    document.getElementById('profileModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeProfile(); });
   </script>
 </body>
 </html>

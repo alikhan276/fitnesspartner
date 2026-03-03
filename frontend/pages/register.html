@@ -8,65 +8,37 @@
 </head>
 <body>
   <div class="auth-page">
-    <div class="auth-left" style="max-width: 640px; padding: 32px 24px;">
+    <div class="auth-left" style="max-width:640px;padding:32px 24px;">
       <div class="auth-box">
         <a href="index.html" class="auth-logo">💪 FitPartner Almaty</a>
-
-        <!-- ШАГИ -->
-        <div class="steps-bar" id="stepsBar">
-          <div class="step-item active" data-step="1">
-            <div class="step-num">1</div>
-            <div class="step-label">Аккаунт</div>
-          </div>
-          <div class="step-item" data-step="2">
-            <div class="step-num">2</div>
-            <div class="step-label">Профиль</div>
-          </div>
-          <div class="step-item" data-step="3">
-            <div class="step-num">3</div>
-            <div class="step-label">Цели</div>
-          </div>
+        <div class="steps-bar">
+          <div class="step-item active" data-step="1"><div class="step-num">1</div><div class="step-label">Аккаунт</div></div>
+          <div class="step-item"        data-step="2"><div class="step-num">2</div><div class="step-label">Профиль</div></div>
+          <div class="step-item"        data-step="3"><div class="step-num">3</div><div class="step-label">Цели</div></div>
         </div>
-
         <div class="alert-box"></div>
 
         <!-- ШАГ 1 -->
         <div id="step1">
           <h1 class="auth-title">Создать аккаунт</h1>
-          <p class="auth-sub">Шаг 1 из 3 — Основная информация</p>
-          <div class="form-group">
-            <label class="form-label">Имя</label>
-            <input type="text" id="rName" class="form-input" placeholder="Ваше имя">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input type="email" id="rEmail" class="form-input" placeholder="your@email.com">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Пароль</label>
-            <input type="password" id="rPass" class="form-input" placeholder="Минимум 6 символов">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Повторите пароль</label>
-            <input type="password" id="rPass2" class="form-input" placeholder="••••••••">
-          </div>
+          <p class="auth-sub">Шаг 1 из 3</p>
+          <div class="form-group"><label class="form-label">Имя</label><input type="text" id="rName" class="form-input" placeholder="Ваше имя"></div>
+          <div class="form-group"><label class="form-label">Email</label><input type="email" id="rEmail" class="form-input" placeholder="your@email.com"></div>
+          <div class="form-group"><label class="form-label">Пароль</label><input type="password" id="rPass" class="form-input" placeholder="Минимум 6 символов"></div>
+          <div class="form-group"><label class="form-label">Повторите пароль</label><input type="password" id="rPass2" class="form-input" placeholder="••••••••"></div>
           <button class="btn btn-primary btn-full" onclick="goStep2()">Далее →</button>
-          <p style="text-align:center; color: var(--muted); margin-top: 16px;">
-            Уже есть аккаунт? <a href="login.html" style="color: var(--accent); font-weight: 700; text-decoration: none;">Войти</a>
+          <p style="text-align:center;color:var(--muted);margin-top:16px;">
+            Уже есть аккаунт? <a href="login.html" style="color:var(--accent);font-weight:700;text-decoration:none;">Войти</a>
           </p>
         </div>
 
         <!-- ШАГ 2 -->
         <div id="step2" style="display:none;">
           <h1 class="auth-title">Ваш профиль</h1>
-          <p class="auth-sub">Шаг 2 из 3 — Расскажите о себе</p>
+          <p class="auth-sub">Шаг 2 из 3</p>
           <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Возраст</label>
-              <input type="number" id="rAge" class="form-input" placeholder="25" min="14" max="80">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Пол</label>
+            <div class="form-group"><label class="form-label">Возраст</label><input type="number" id="rAge" class="form-input" placeholder="25" min="14" max="80"></div>
+            <div class="form-group"><label class="form-label">Пол</label>
               <select id="rGender" class="form-select">
                 <option value="">Выберите</option>
                 <option value="male">Мужской</option>
@@ -75,8 +47,7 @@
               </select>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Район Алматы</label>
+          <div class="form-group"><label class="form-label">Район Алматы</label>
             <select id="rDistrict" class="form-select">
               <option value="">Выберите район</option>
               <option>Алатауский</option><option>Алмалинский</option><option>Ауэзовский</option>
@@ -84,19 +55,15 @@
               <option>Наурызбайский</option><option>Турксибский</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Уровень подготовки</label>
+          <div class="form-group"><label class="form-label">Уровень</label>
             <select id="rLevel" class="form-select">
               <option value="beginner">Новичок</option>
               <option value="intermediate">Средний</option>
               <option value="advanced">Продвинутый</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Спортзал (опционально)</label>
-            <input type="text" id="rGym" class="form-input" placeholder="Название зала или адрес">
-          </div>
-          <div style="display:flex; gap:12px;">
+          <div class="form-group"><label class="form-label">Спортзал (опционально)</label><input type="text" id="rGym" class="form-input" placeholder="Название зала"></div>
+          <div style="display:flex;gap:12px;">
             <button class="btn btn-ghost" onclick="showStep(1)">← Назад</button>
             <button class="btn btn-primary" style="flex:1" onclick="goStep3()">Далее →</button>
           </div>
@@ -105,11 +72,10 @@
         <!-- ШАГ 3 -->
         <div id="step3" style="display:none;">
           <h1 class="auth-title">Ваши цели</h1>
-          <p class="auth-sub">Шаг 3 из 3 — Что вы хотите достичь?</p>
-
+          <p class="auth-sub">Шаг 3 из 3</p>
           <div class="form-group">
             <label class="form-label">Цели тренировок</label>
-            <div class="tags-selector" id="goalsSelector">
+            <div class="tags-selector">
               <div class="tag-btn" onclick="toggleTag(this,'goals')">⚖️ Похудение</div>
               <div class="tag-btn" onclick="toggleTag(this,'goals')">💪 Набор мышц</div>
               <div class="tag-btn" onclick="toggleTag(this,'goals')">🏃 Выносливость</div>
@@ -118,23 +84,17 @@
               <div class="tag-btn" onclick="toggleTag(this,'goals')">❤️ Кардио</div>
             </div>
           </div>
-
           <div class="form-group">
             <label class="form-label">Когда тренируетесь?</label>
-            <div class="tags-selector" id="scheduleSelector">
+            <div class="tags-selector">
               <div class="tag-btn" onclick="toggleTag(this,'schedule')">🌅 Утро</div>
               <div class="tag-btn" onclick="toggleTag(this,'schedule')">🌆 Вечер</div>
               <div class="tag-btn" onclick="toggleTag(this,'schedule')">📅 Выходные</div>
               <div class="tag-btn" onclick="toggleTag(this,'schedule')">🕐 Обед</div>
             </div>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">О себе (опционально)</label>
-            <textarea id="rBio" class="form-textarea" placeholder="Расскажите кратко о себе и своих целях..."></textarea>
-          </div>
-
-          <div style="display:flex; gap:12px;">
+          <div class="form-group"><label class="form-label">О себе</label><textarea id="rBio" class="form-textarea" placeholder="Расскажите кратко о себе..."></textarea></div>
+          <div style="display:flex;gap:12px;">
             <button class="btn btn-ghost" onclick="showStep(2)">← Назад</button>
             <button class="btn btn-primary btn-full" id="regBtn" onclick="doRegister()">Создать аккаунт 🎉</button>
           </div>
@@ -146,27 +106,27 @@
   <script src="../js/api.js"></script>
   <script>
     redirectAuth();
-    const selectedTags = { goals: [], schedule: [] };
+    const tags = { goals: [], schedule: [] };
 
     function toggleTag(el, type) {
       el.classList.toggle('selected');
-      const val = el.textContent.replace(/[^а-яА-ЯёЁa-zA-Z\s]/g, '').trim();
-      if (el.classList.contains('selected')) selectedTags[type].push(val);
-      else selectedTags[type] = selectedTags[type].filter(t => t !== val);
+      const val = el.textContent.trim();
+      if (el.classList.contains('selected')) tags[type].push(val);
+      else tags[type] = tags[type].filter(t => t !== val);
     }
 
     function showStep(n) {
       [1,2,3].forEach(i => {
-        document.getElementById(`step${i}`).style.display = i === n ? 'block' : 'none';
-        const s = document.querySelector(`.step-item[data-step="${i}"]`);
-        s.className = 'step-item' + (i === n ? ' active' : i < n ? ' done' : '');
+        document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+        const s = document.querySelector('.step-item[data-step="'+i+'"]');
+        s.className = 'step-item' + (i===n ? ' active' : i<n ? ' done' : '');
       });
     }
 
     function goStep2() {
       const name = document.getElementById('rName').value.trim();
       const email = document.getElementById('rEmail').value.trim();
-      const p = document.getElementById('rPass').value;
+      const p  = document.getElementById('rPass').value;
       const p2 = document.getElementById('rPass2').value;
       if (!name || !email || !p) return showAlert('Заполните все поля');
       if (p !== p2) return showAlert('Пароли не совпадают');
@@ -184,17 +144,17 @@
       setBtn(btn, true);
       try {
         const data = await Auth.register({
-          name: document.getElementById('rName').value.trim(),
-          email: document.getElementById('rEmail').value.trim(),
-          password: document.getElementById('rPass').value,
-          age: parseInt(document.getElementById('rAge').value) || undefined,
-          gender: document.getElementById('rGender').value || undefined,
-          district: document.getElementById('rDistrict').value,
+          name:         document.getElementById('rName').value.trim(),
+          email:        document.getElementById('rEmail').value.trim(),
+          password:     document.getElementById('rPass').value,
+          age:          parseInt(document.getElementById('rAge').value) || undefined,
+          gender:       document.getElementById('rGender').value || undefined,
+          district:     document.getElementById('rDistrict').value,
           fitnessLevel: document.getElementById('rLevel').value,
-          gym: document.getElementById('rGym').value.trim() || undefined,
-          bio: document.getElementById('rBio').value.trim() || undefined,
-          goals: selectedTags.goals,
-          schedule: selectedTags.schedule
+          gym:          document.getElementById('rGym').value.trim() || undefined,
+          bio:          document.getElementById('rBio').value.trim() || undefined,
+          goals:        tags.goals,
+          schedule:     tags.schedule
         });
         localStorage.setItem('fp_token', data.token);
         localStorage.setItem('fp_user', JSON.stringify(data.user));

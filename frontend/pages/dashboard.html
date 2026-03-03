@@ -3,114 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Дашборд — FitPartner</title>
+  <title>Главная — FitPartner</title>
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <nav class="navbar">
     <div class="nav-logo">💪 FitPartner</div>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link active">🏠 <span>Главная</span></a>
-      <a href="partners.html" class="nav-link">🔍 <span>Партнёры</span></a>
-      <a href="messages.html" class="nav-link">💬 <span>Сообщения</span></a>
+      <a href="dashboard.html"    class="nav-link active">🏠 <span>Главная</span></a>
+      <a href="partners.html"     class="nav-link">🔍 <span>Партнёры</span></a>
+      <a href="messages.html"     class="nav-link">💬 <span>Сообщения</span></a>
       <a href="subscription.html" class="nav-link">⭐ <span>Подписка</span></a>
-      <a href="profile.html" class="nav-link">👤 <span>Профиль</span></a>
+      <a href="profile.html"      class="nav-link">👤 <span>Профиль</span></a>
       <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
     </div>
   </nav>
 
-  <div class="page-wrapper container" style="padding-top: 88px; padding-bottom: 40px;">
-    <div style="margin-bottom: 32px;">
-      <h1 style="font-size: 32px; font-weight: 900; letter-spacing: -1px;">
-        Привет, <span id="userName" class="gradient-text">...</span>! 👋
-      </h1>
-      <p style="color: var(--muted); margin-top: 4px;">Готов к тренировке сегодня?</p>
+  <div class="page-wrapper container" style="padding-top:88px;padding-bottom:40px;">
+    <div style="margin-bottom:32px;">
+      <h1 style="font-size:32px;font-weight:900;letter-spacing:-1px;">Привет, <span id="userName" class="gradient-text">...</span>! 👋</h1>
+      <p style="color:var(--muted);margin-top:4px;">Готов к тренировке сегодня?</p>
     </div>
 
-    <!-- ПОДПИСКА БАННЕР -->
-    <div id="subBanner" style="display:none; background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,107,53,0.05)); border: 1px solid rgba(255,107,53,0.3); border-radius: 16px; padding: 20px 24px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap;">
+    <!-- баннер подписки -->
+    <div id="subBanner" style="display:none;background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,107,53,0.05));border:1px solid rgba(255,107,53,0.3);border-radius:16px;padding:20px 24px;margin-bottom:28px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
       <div>
-        <div style="font-weight: 700; margin-bottom: 4px;">🔓 Откройте все возможности</div>
-        <div style="color: var(--muted); font-size: 14px;">Оформите подписку и получите доступ ко всем партнёрам</div>
+        <div style="font-weight:700;margin-bottom:4px;">🔓 Откройте все возможности</div>
+        <div style="color:var(--muted);font-size:14px;">Оформите подписку за 1 000 ₸ и получите полный доступ</div>
       </div>
-      <a href="subscription.html" class="btn btn-sm" style="background: var(--orange); color: #fff; flex-shrink: 0;">Подписаться</a>
+      <a href="subscription.html" class="btn btn-sm" style="background:var(--orange);color:#fff;flex-shrink:0;">Подписаться</a>
     </div>
 
-    <!-- СТАТЫ -->
-    <div class="dash-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-label">Мой район</div>
-        <div class="stat-value" id="myDistrict" style="font-size: 22px;">—</div>
-        <div class="stat-desc">Алматы</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Мой уровень</div>
-        <div class="stat-value" id="myLevel" style="font-size: 22px;">—</div>
-        <div class="stat-desc">Подготовки</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Статус</div>
-        <div class="stat-value" id="myStatus" style="font-size: 22px;">🔓</div>
-        <div class="stat-desc" id="myStatusLabel">Базовый</div>
-      </div>
+    <div class="dash-grid">
+      <div class="stat-card"><div class="stat-label">Мой район</div><div class="stat-value" id="myDistrict">—</div><div class="stat-desc">Алматы</div></div>
+      <div class="stat-card"><div class="stat-label">Уровень</div><div class="stat-value" id="myLevel">—</div><div class="stat-desc">Подготовки</div></div>
+      <div class="stat-card"><div class="stat-label">Подписка</div><div class="stat-value" id="myStatus">🔓</div><div class="stat-desc" id="myStatusLabel">Базовый</div></div>
     </div>
 
-    <!-- НОВЫЕ УЧАСТНИКИ -->
     <div class="card">
       <div class="card-header">
         <div class="card-title">🆕 Новые участники в Алматы</div>
         <a href="partners.html" class="btn btn-outline btn-sm">Все партнёры</a>
       </div>
-      <div id="newUsersList" class="partners-grid">
-        <div class="loading-screen"><div class="loader"></div></div>
-      </div>
+      <div id="newUsersList" class="partners-grid"><div class="loading-screen"><div class="loader"></div></div></div>
     </div>
   </div>
 
   <script src="../js/api.js"></script>
   <script>
     if (!requireAuth()) throw 0;
-
     (async () => {
       try {
         const { user } = await Auth.me();
-        localStorage.setItem('fp_user', JSON.stringify({ id: user._id, name: user.name, email: user.email, isSubscribed: user.isSubscribed, subscriptionPlan: user.subscriptionPlan, district: user.district }));
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('myDistrict').textContent = user.district || 'Не указан';
-        document.getElementById('myLevel').textContent = levelLabel[user.fitnessLevel] || '—';
-        if (user.isSubscribed) {
-          document.getElementById('myStatus').textContent = user.subscriptionPlan === 'premium' ? '⭐' : '✅';
-          document.getElementById('myStatusLabel').textContent = user.subscriptionPlan === 'premium' ? 'Premium' : 'Basic';
+        document.getElementById('userName').textContent    = user.name;
+        document.getElementById('myDistrict').textContent  = user.district || 'Не указан';
+        document.getElementById('myLevel').textContent     = levelLabel[user.fitness_level] || '—';
+        if (user.is_subscribed) {
+          document.getElementById('myStatus').textContent      = '⭐';
+          document.getElementById('myStatusLabel').textContent = 'Активна';
         } else {
           document.getElementById('subBanner').style.display = 'flex';
         }
-        await loadNewUsers();
-      } catch (e) { showAlert(e.message); }
-    })();
-
-    async function loadNewUsers() {
-      try {
         const { users } = await Users.getAll();
         const box = document.getElementById('newUsersList');
         if (!users.length) { box.innerHTML = '<div class="empty-state"><div class="empty-icon">🤷</div><div class="empty-title">Пока никого нет</div></div>'; return; }
-        box.innerHTML = users.slice(0, 6).map(u => `
+        box.innerHTML = users.slice(0,6).map(u => `
           <div class="partner-card" onclick="window.location.href='partners.html'">
             <div class="partner-card-top">
-              <div class="partner-avatar">${getAvatar(u.name)} ${u.isOnline ? '<div class="partner-online-dot"></div>' : ''}</div>
+              <div class="partner-avatar">${getAvatar(u.name)}${u.is_online?'<div class="partner-online-dot"></div>':''}</div>
               <div>
                 <div class="partner-name">${u.name}</div>
-                <div class="partner-meta">📍 ${u.district || 'Алматы'} · ${levelLabel[u.fitnessLevel] || 'Новичок'}</div>
+                <div class="partner-meta">📍 ${u.district||'Алматы'} · ${levelLabel[u.fitness_level]||'Новичок'}</div>
               </div>
             </div>
-            ${u.bio ? `<div class="partner-bio">${u.bio.slice(0, 80)}${u.bio.length > 80 ? '...' : ''}</div>` : ''}
+            ${u.bio?'<div class="partner-bio">'+u.bio.slice(0,80)+(u.bio.length>80?'...':'')+'</div>':''}
             <div class="partner-tags">
-              ${(u.goals || []).slice(0, 3).map(g => `<span class="badge badge-blue">${g}</span>`).join('')}
-              ${u.isOnline ? '<span class="badge badge-online">● Онлайн</span>' : ''}
+              ${(u.goals||[]).slice(0,3).map(g=>'<span class="badge badge-blue">'+g+'</span>').join('')}
+              ${u.is_online?'<span class="badge badge-online">● Онлайн</span>':''}
             </div>
-          </div>
-        `).join('');
-      } catch (e) {}
-    }
+          </div>`).join('');
+      } catch (e) { showAlert(e.message); }
+    })();
   </script>
 </body>
 </html>

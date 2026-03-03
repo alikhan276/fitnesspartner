@@ -1,7 +1,7 @@
 const API = 'http://localhost:5000/api';
 
 const getToken = () => localStorage.getItem('fp_token');
-const getUser = () => JSON.parse(localStorage.getItem('fp_user') || 'null');
+const getUser  = () => JSON.parse(localStorage.getItem('fp_user') || 'null');
 
 const http = async (method, endpoint, body) => {
   const token = getToken();
@@ -9,7 +9,7 @@ const http = async (method, endpoint, body) => {
     method,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
+      ...(token ? { Authorization: 'Bearer ' + token } : {})
     },
     ...(body ? { body: JSON.stringify(body) } : {})
   });
@@ -19,11 +19,11 @@ const http = async (method, endpoint, body) => {
 };
 
 const Auth = {
-  register: (d) => http('POST', '/auth/register', d),
-  login: (e, p) => http('POST', '/auth/login', { email: e, password: p }),
-  me: () => http('GET', '/auth/me'),
-  updateProfile: (d) => http('PUT', '/auth/profile', d),
-  subscribe: (plan, kaspiPhone) => http('POST', '/auth/subscribe', { plan, kaspiPhone }),
+  register:      (d)       => http('POST', '/auth/register', d),
+  login:         (e, p)    => http('POST', '/auth/login', { email: e, password: p }),
+  me:            ()        => http('GET',  '/auth/me'),
+  updateProfile: (d)       => http('PUT',  '/auth/profile', d),
+  subscribe:     (kaspiPhone) => http('POST', '/auth/subscribe', { kaspiPhone }),
   logout() {
     localStorage.removeItem('fp_token');
     localStorage.removeItem('fp_user');
@@ -32,27 +32,25 @@ const Auth = {
 };
 
 const Users = {
-  getAll: (params = {}) => {
-    const q = new URLSearchParams(params).toString();
-    return http('GET', `/users${q ? '?' + q : ''}`);
-  },
-  getById: (id) => http('GET', `/users/${id}`)
+  getAll:  (params = {}) => http('GET', '/users' + (Object.keys(params).length ? '?' + new URLSearchParams(params) : '')),
+  getById: (id)          => http('GET', '/users/' + id)
 };
 
 const Messages = {
-  getChats: () => http('GET', '/messages'),
-  getDialog: (userId) => http('GET', `/messages/${userId}`),
-  send: (userId, text) => http('POST', `/messages/${userId}`, { text })
+  getChats:  ()           => http('GET',  '/messages'),
+  getDialog: (userId)     => http('GET',  '/messages/' + userId),
+  send:      (userId, text) => http('POST', '/messages/' + userId, { text })
 };
 
-// Utils
-const showAlert = (msg, type = 'error', container) => {
-  const box = container || document.querySelector('.alert-box') || document.body;
-  const existing = box.querySelector('.alert');
-  if (existing) existing.remove();
+// ---- Утилиты ----
+const showAlert = (msg, type = 'error') => {
+  const box = document.querySelector('.alert-box');
+  if (!box) return;
+  const old = box.querySelector('.alert');
+  if (old) old.remove();
   const el = document.createElement('div');
-  el.className = `alert alert-${type}`;
-  el.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${msg}`;
+  el.className = 'alert alert-' + type;
+  el.innerHTML = '<span>' + (type === 'success' ? '✓' : '✕') + '</span> ' + msg;
   box.insertBefore(el, box.firstChild);
   setTimeout(() => el.remove(), 5000);
 };
@@ -63,18 +61,12 @@ const setBtn = (btn, loading, text) => {
   else btn.innerHTML = text || btn.dataset.orig;
 };
 
-const fmt = (date) => new Date(date).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
-const fmtTime = (date) => new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+const fmtTime = (d) => new Date(d).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+const fmtDate = (d) => new Date(d).toLocaleDateString('ru-RU');
 
-const requireAuth = () => { if (!getToken()) { window.location.href = '/pages/login.html'; return false; } return true; };
+const requireAuth  = () => { if (!getToken()) { window.location.href = '/pages/login.html'; return false; } return true; };
 const redirectAuth = () => { if (getToken()) window.location.href = '/pages/dashboard.html'; };
 
-const avatarEmojis = ['🏋️', '💪', '🤸', '🏃', '🚴', '⚽', '🥊', '🏊', '🎯', '🔥'];
-const getAvatar = (name) => avatarEmojis[(name?.charCodeAt(0) || 0) % avatarEmojis.length];
-
-const levelLabel = { beginner: 'Новичок', intermediate: 'Средний', advanced: 'Продвинутый' };
-const goalLabel = {
-  'Похудение': '⚖️ Похудение', 'Набор мышц': '💪 Набор мышц',
-  'Выносливость': '🏃 Выносливость', 'Гибкость': '🤸 Гибкость',
-  'Общий тонус': '✨ Тонус', 'Кардио': '❤️ Кардио'
-};
+const avatarEmojis = ['🏋️','💪','🤸','🏃','🚴','⚽','🥊','🏊','🎯','🔥'];
+const getAvatar    = (name) => avatarEmojis[(name?.charCodeAt(0) || 0) % avatarEmojis.length];
+const levelLabel   = { beginner: 'Новичок', intermediate: 'Средний', advanced: 'Продвинутый' };

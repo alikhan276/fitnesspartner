@@ -6,33 +6,30 @@
   <title>Сообщения — FitPartner</title>
   <link rel="stylesheet" href="../css/style.css">
 </head>
-<body style="overflow: hidden;">
+<body style="overflow:hidden;">
   <nav class="navbar">
     <div class="nav-logo">💪 FitPartner</div>
     <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">🏠</a>
-      <a href="partners.html" class="nav-link">🔍</a>
-      <a href="messages.html" class="nav-link active">💬</a>
+      <a href="dashboard.html"    class="nav-link">🏠</a>
+      <a href="partners.html"     class="nav-link">🔍</a>
+      <a href="messages.html"     class="nav-link active">💬</a>
       <a href="subscription.html" class="nav-link">⭐</a>
-      <a href="profile.html" class="nav-link">👤</a>
+      <a href="profile.html"      class="nav-link">👤</a>
       <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">Выйти</button>
     </div>
   </nav>
 
-  <div style="padding-top: 68px; height: 100vh;">
+  <div style="padding-top:68px;height:100vh;">
     <div class="messages-layout">
-      <!-- САЙДБАР ЧАТОВ -->
       <div class="chats-sidebar">
         <div class="chats-header">💬 Чаты</div>
         <div id="chatsList"><div class="loading-screen"><div class="loader"></div></div></div>
       </div>
-
-      <!-- ОСНОВНАЯ ЗОНА -->
       <div class="chat-main" id="chatMain">
         <div class="no-chat-selected">
-          <div class="no-chat-icon">💬</div>
+          <div style="font-size:64px;">💬</div>
           <div>Выберите чат или найдите партнёра</div>
-          <a href="partners.html" class="btn btn-primary btn-sm" style="margin-top: 12px;">Найти партнёра</a>
+          <a href="partners.html" class="btn btn-primary btn-sm" style="margin-top:12px;">Найти партнёра</a>
         </div>
       </div>
     </div>
@@ -44,85 +41,63 @@
     const me = getUser();
     let activeUserId = null;
 
-    const params = new URLSearchParams(location.search);
-    const initUserId = params.get('userId');
-    const initUserName = params.get('userName');
+    const sp = new URLSearchParams(location.search);
+    const initId   = sp.get('userId');
+    const initName = sp.get('userName');
 
     loadChats();
-    if (initUserId) openChat(initUserId, initUserName || 'Пользователь');
+    if (initId) openChat(initId, decodeURIComponent(initName || 'Пользователь'));
 
     async function loadChats() {
       try {
         const { chats } = await Messages.getChats();
         const box = document.getElementById('chatsList');
-        if (!chats.length) {
-          box.innerHTML = '<div style="padding: 24px; color: var(--muted); text-align:center; font-size:14px;">Нет чатов. Найдите партнёра!</div>';
-          return;
-        }
+        if (!chats.length) { box.innerHTML = '<div style="padding:24px;color:var(--muted);text-align:center;font-size:14px;">Нет чатов. Найдите партнёра!</div>'; return; }
         box.innerHTML = chats.map(c => `
-          <div class="chat-item" id="chat-${c.user._id}" onclick="openChat('${c.user._id}', '${c.user.name}')">
-            <div class="chat-avatar">${getAvatar(c.user.name)}</div>
-            <div style="min-width:0; flex:1;">
-              <div class="chat-name">${c.user.name}</div>
-              <div class="chat-preview">${c.lastMessage.text}</div>
+          <div class="chat-item" id="chat-${c.other_id}" onclick="openChat('${c.other_id}','${c.other_name}')">
+            <div class="chat-avatar">${getAvatar(c.other_name)}</div>
+            <div style="min-width:0;flex:1;">
+              <div class="chat-name">${c.other_name}</div>
+              <div class="chat-preview">${c.last_text}</div>
             </div>
-            ${c.unread ? `<div class="chat-unread">${c.unread}</div>` : ''}
-          </div>
-        `).join('');
-      } catch (e) {}
+            ${c.unread_count>0?'<div class="chat-unread">'+c.unread_count+'</div>':''}
+          </div>`).join('');
+      } catch(e) {}
     }
 
     async function openChat(userId, userName) {
       activeUserId = userId;
       document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-      const chatEl = document.getElementById(`chat-${userId}`);
-      if (chatEl) chatEl.classList.add('active');
+      const el = document.getElementById('chat-'+userId);
+      if (el) el.classList.add('active');
 
       document.getElementById('chatMain').innerHTML = `
         <div class="chat-header">
           <div class="chat-avatar" style="width:40px;height:40px;font-size:18px;">${getAvatar(userName)}</div>
-          <div>
-            <div style="font-weight:700;">${userName}</div>
-            <div style="font-size:12px; color:var(--muted);">📍 Алматы</div>
-          </div>
-          <a href="partners.html" class="btn btn-ghost btn-sm" style="margin-left:auto;">Профиль</a>
+          <div><div style="font-weight:700;">${userName}</div><div style="font-size:12px;color:var(--muted);">📍 Алматы</div></div>
+          <a href="partners.html" class="btn btn-ghost btn-sm" style="margin-left:auto;">Найти ещё</a>
         </div>
-        <div class="chat-messages" id="messagesBox">
-          <div class="loading-screen"><div class="loader"></div></div>
-        </div>
+        <div class="chat-messages" id="msgBox"><div class="loading-screen"><div class="loader"></div></div></div>
         <div class="chat-input-area">
-          <textarea class="chat-input" id="msgInput" placeholder="Написать сообщение..." rows="1" onkeydown="handleKey(event)"></textarea>
-          <button class="btn btn-primary" onclick="sendMsg()" style="height:50px; padding: 0 20px;">➤</button>
-        </div>
-      `;
+          <input type="text" class="chat-input" id="msgInput" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="btn btn-primary" onclick="sendMsg()" style="height:50px;padding:0 20px;">➤</button>
+        </div>`;
 
       try {
         const { messages } = await Messages.getDialog(userId);
-        renderMessages(messages);
-      } catch (e) {}
+        renderMsgs(messages);
+      } catch(e) {}
     }
 
-    function renderMessages(messages) {
-      const box = document.getElementById('messagesBox');
+    function renderMsgs(messages) {
+      const box = document.getElementById('msgBox');
       if (!box) return;
-      if (!messages.length) {
-        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding: 40px;">Начните диалог! 👋</div>';
-        return;
-      }
+      if (!messages.length) { box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">Начните диалог! 👋</div>'; return; }
       box.innerHTML = messages.map(m => {
-        const mine = m.from._id === me?.id || m.from === me?.id;
-        return `
-          <div class="msg-bubble ${mine ? 'mine' : 'theirs'}">
-            <div>${m.text}</div>
-            <div class="msg-time">${fmtTime(m.createdAt)}</div>
-          </div>
-        `;
+        const mine = String(m.from_user) === String(me?.id);
+        return '<div class="msg-bubble '+(mine?'mine':'theirs')+'"><div>'+m.text+'</div><div class="msg-time">'+fmtTime(m.created_at)+'</div></div>';
       }).join('');
       box.scrollTop = box.scrollHeight;
-    }
-
-    function handleKey(e) {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
     }
 
     async function sendMsg() {
@@ -133,18 +108,16 @@
       input.value = '';
       try {
         const { message } = await Messages.send(activeUserId, text);
-        const box = document.getElementById('messagesBox');
+        const box = document.getElementById('msgBox');
         if (box) {
           const el = document.createElement('div');
           el.className = 'msg-bubble mine';
-          el.innerHTML = `<div>${message.text}</div><div class="msg-time">${fmtTime(message.createdAt)}</div>`;
+          el.innerHTML = '<div>'+message.text+'</div><div class="msg-time">'+fmtTime(message.created_at)+'</div>';
           box.appendChild(el);
           box.scrollTop = box.scrollHeight;
         }
         loadChats();
-      } catch (e) {
-        showAlert(e.message);
-      }
+      } catch(e) { showAlert(e.message); }
     }
   </script>
 </body>

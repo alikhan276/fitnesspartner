@@ -3,59 +3,40 @@ const router = express.Router();
 const Message = require('../models/Message');
 const { protect } = require('../middleware/auth');
 
-// ПОЛУЧИТЬ ДИАЛОГ
+// GET /api/messages — список всех чатов
+router.get('/', protect, async (req, res) => {
+  try {
+    const chats = await Message.getChats(req.user.id);
+    res.json({ success: true, chats });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// GET /api/messages/:userId — диалог с пользователем
 router.get('/:userId', protect, async (req, res) => {
   try {
-    const messages = await Message.find({
-      $or: [
-        { from: req.user._id, to: req.params.userId },
-        { from: req.params.userId, to: req.user._id }
-      ]
-    }).populate('from', 'name').populate('to', 'name').sort({ createdAt: 1 });
-
-    // Пометить как прочитанные
-    await Message.updateMany({ from: req.params.userId, to: req.user._id, read: false }, { read: true });
-
+    const messages = await Message.getDialog(req.user.id, req.params.userId);
+    await Message.markRead(req.params.userId, req.user.id);
     res.json({ success: true, messages });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// ОТПРАВИТЬ СООБЩЕНИЕ
+// POST /api/messages/:userId — отправить сообщение
 router.post('/:userId', protect, async (req, res) => {
   try {
     const { text } = req.body;
-    if (!text?.trim()) return res.status(400).json({ success: false, message: 'Сообщение пустое' });
-    const message = await Message.create({ from: req.user._id, to: req.params.userId, text: text.trim() });
-    const populated = await Message.findById(message._id).populate('from', 'name').populate('to', 'name');
-    res.status(201).json({ success: true, message: populated });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: 'Сообщение пустое' });
+    }
 
-// СПИСОК ЧАТОВ (все диалоги)
-router.get('/', protect, async (req, res) => {
-  try {
-    const messages = await Message.find({
-      $or: [{ from: req.user._id }, { to: req.user._id }]
-    }).populate('from', 'name district').populate('to', 'name district').sort({ createdAt: -1 });
-
-    const chats = {};
-    messages.forEach(msg => {
-      const otherId = msg.from._id.toString() === req.user._id.toString()
-        ? msg.to._id.toString() : msg.from._id.toString();
-      if (!chats[otherId]) {
-        const other = msg.from._id.toString() === req.user._id.toString() ? msg.to : msg.from;
-        chats[otherId] = { user: other, lastMessage: msg, unread: 0 };
-      }
-      if (msg.to._id.toString() === req.user._id.toString() && !msg.read) {
-        chats[otherId].unread++;
-      }
+    const msg = await Message.create(req.user.id, req.params.userId, text.trim());
+    res.status(201).json({
+      success: true,
+      message: { ...msg, from_name: req.user.name }
     });
-
-    res.json({ success: true, chats: Object.values(chats) });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
